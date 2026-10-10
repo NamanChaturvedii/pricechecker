@@ -18,6 +18,7 @@ const DATA = process.env.PRICE_CHECKER_DATA || path.join(ROOT, 'data');
 const PORT = Number(process.env.PORT || 3939);
 const NO_UPDATE = process.env.PRICE_CHECKER_NO_UPDATE === '1';
 const RESTART = 42;
+const ALREADY_RUNNING = 3;
 const UPDATE_EVERY_MS = 6 * 60 * 60 * 1000;
 // never overwritten by an update
 const KEEP = new Set(['data', 'runtime', 'extensions', '.git', 'update.config.json', 'node_modules', '.next']);
@@ -197,7 +198,7 @@ async function updateAndMaybeRestart() {
 
 if (await portInUse(PORT)) {
   log(`Price Checker already running on port ${PORT}`);
-  process.exit(0);
+  process.exit(ALREADY_RUNNING);
 }
 
 const autoInstall = updateCfg().autoInstall !== false;

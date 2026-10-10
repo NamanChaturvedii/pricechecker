@@ -61,19 +61,14 @@ try {
   $ws = New-Object -ComObject WScript.Shell
   $lnk = $ws.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Startup')) 'Price Checker.lnk'))
   $lnk.TargetPath = 'wscript.exe'
-  $lnk.Arguments = "`"$vbs`""
+  $lnk.Arguments = "`"$vbs`" /background"   # start quietly at login, no browser
   $lnk.WorkingDirectory = $Root
   $lnk.Save()
   Set-Content -Path (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Price Checker.url') -Value "[InternetShortcut]`r`nURL=http://localhost:$Port`r`n"
 
   Write-Host ""
   Write-Host "Starting Price Checker..." -ForegroundColor Green
-  Start-Process wscript.exe "`"$vbs`""
-  for ($i = 0; $i -lt 60; $i++) {
-    Start-Sleep 1
-    try { (New-Object Net.Sockets.TcpClient('127.0.0.1', $Port)).Close(); break } catch {}
-  }
-  Start-Process "http://localhost:$Port"
+  Start-Process wscript.exe "`"$vbs`""   # starts the app and opens the dashboard when ready
   Write-Host ""
   Write-Host "Done! Dashboard: http://localhost:$Port   (login: admin / admin123 - change it in Settings)" -ForegroundColor Green
   Write-Host "A 'Price Checker' shortcut is on your Desktop. It starts automatically when Windows starts."

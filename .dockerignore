@@ -1,0 +1,6 @@
+data
+runtime
+app/node_modules
+app/.next
+**/*.log
+.git

@@ -1,0 +1,10 @@
+data/
+runtime/
+app/node_modules/
+app/.next/
+app/next-env.d.ts
+app/*.tsbuildinfo
+extensions/*/
+*.log
+.env*
+.venv/

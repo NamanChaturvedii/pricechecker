@@ -13,9 +13,9 @@ export const REPORTS_DIR = path.join(DATA_DIR, 'reports');
 for (const d of [DATA_DIR, RUNS_DIR, REPORTS_DIR]) fs.mkdirSync(d, { recursive: true });
 
 export const DEFAULT_SETTINGS = {
-  pincode: '324002',
+  pincode: '122004',
   // Items not found at `pincode` are searched at these, in order, until found.
-  fallbackPincodes: ['302001'],
+  fallbackPincodes: ['122001', '122018', '122505'],
   scheduleEnabled: true,
   scheduleTime: '07:00',
   sites: { zepto: true, blinkit: true, amazon: true, flipkart: true },

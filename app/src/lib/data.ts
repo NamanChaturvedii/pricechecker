@@ -28,8 +28,8 @@ export type Settings = {
 };
 
 export const DEFAULT_SETTINGS: Settings = {
-  pincode: '324002',
-  fallbackPincodes: ['302001'],
+  pincode: '122004',
+  fallbackPincodes: ['122001', '122018', '122505'],
   scheduleEnabled: true,
   scheduleTime: '07:00',
   sites: { zepto: true, blinkit: true, amazon: true, flipkart: true },

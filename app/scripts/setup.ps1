@@ -1,6 +1,7 @@
 # One-time setup for Price Checker on a Windows laptop. Run via Setup.bat (double-click).
 # Installs a private copy of Node.js, the app's packages and the scraping browser,
 # then makes the app start automatically with Windows and opens the dashboard.
+param([switch]$NoShortcuts)   # -NoShortcuts: install/build only (used for testing)
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'   # makes Invoke-WebRequest much faster
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -23,12 +24,18 @@ try {
 
   Step 1 "Node.js"
   if (-not (Test-Path (Join-Path $NodeDir 'node.exe'))) {
-    $v = (Invoke-RestMethod 'https://nodejs.org/dist/index.json' | Where-Object { $_.version -like 'v22.*' } | Select-Object -First 1).version
+    # Windows PowerShell 5.1 returns the JSON array as ONE object, so foreach over it explicitly
+    $v = 'v22.23.3'   # known-good fallback
+    try {
+      $index = Invoke-RestMethod 'https://nodejs.org/dist/index.json'
+      foreach ($rel in $index) { if ("$($rel.version)" -match '^v22\.\d+\.\d+$') { $v = $rel.version; break } }
+    } catch { Write-Host "Could not read the Node.js version list, using $v" }
     Write-Host "Downloading Node.js $v ..."
     $zip = Join-Path $env:TEMP "node-$v-win-x64.zip"
     Invoke-WebRequest "https://nodejs.org/dist/$v/node-$v-win-x64.zip" -OutFile $zip -UseBasicParsing
     New-Item -ItemType Directory -Force $Runtime | Out-Null
     tar -xf $zip -C $Runtime; Check 'Extracting Node.js'
+    if (Test-Path $NodeDir) { Remove-Item $NodeDir -Recurse -Force }   # leftover from an earlier failed attempt
     Rename-Item (Join-Path $Runtime "node-$v-win-x64") 'node'
     Remove-Item $zip -Force
   } else { Write-Host "Already installed." }
@@ -47,6 +54,7 @@ try {
   & $npm run build; Check 'Build'
   Pop-Location
 
+  if ($NoShortcuts) { Write-Host ""; Write-Host "Install + build OK (shortcuts and start skipped)." -ForegroundColor Green; exit 0 }
   Step 5 "Start with Windows + desktop shortcut"
   New-Item -ItemType Directory -Force (Join-Path $Root 'data') | Out-Null
   $vbs = Join-Path $Root 'Start Price Checker.vbs'
